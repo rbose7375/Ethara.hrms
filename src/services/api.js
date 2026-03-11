@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { clearAuthData, getToken } from './auth';
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'https://sunny-art-production-22c6.up.railway.app';
 
 const api = axios.create({
   baseURL: `${BASE_URL}/api/v1/`,
