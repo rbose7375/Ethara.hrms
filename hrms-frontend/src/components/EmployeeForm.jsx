@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-} from '@mui/material';
+import { Button, Card, CardContent, Grid, Stack, TextField, Typography } from '@mui/material';
 
 const initialForm = {
   employee_id: '',
@@ -17,82 +8,48 @@ const initialForm = {
   department: '',
 };
 
-function EmployeeForm({ open, onClose, onSubmit, isSubmitting }) {
-  const [formData, setFormData] = useState(initialForm);
+function EmployeeForm({ onSubmit, submitting }) {
+  const [form, setForm] = useState(initialForm);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleChange = (key) => (event) => {
+    setForm((prev) => ({ ...prev, [key]: event.target.value }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await onSubmit(formData);
-    setFormData(initialForm);
-  };
-
-  const handleClose = () => {
-    setFormData(initialForm);
-    onClose();
+    await onSubmit(form);
+    setForm(initialForm);
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle>Add Employee</DialogTitle>
-      <Box component="form" onSubmit={handleSubmit}>
-        <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                name="employee_id"
-                label="Employee ID"
-                value={formData.employee_id}
-                onChange={handleChange}
-                fullWidth
-              />
+    <Card sx={{ borderRadius: 3 }}>
+      <CardContent>
+        <Typography variant="h6" fontWeight={700} mb={2.5}>
+          Add Employee
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <Grid container spacing={2.5}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField label="Employee ID" value={form.employee_id} onChange={handleChange('employee_id')} fullWidth required />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                name="department"
-                label="Department"
-                value={formData.department}
-                onChange={handleChange}
-                fullWidth
-              />
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField label="Full Name" value={form.full_name} onChange={handleChange('full_name')} fullWidth required />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                name="full_name"
-                label="Full Name"
-                value={formData.full_name}
-                onChange={handleChange}
-                fullWidth
-              />
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField label="Email" type="email" value={form.email} onChange={handleChange('email')} fullWidth required />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                type="email"
-                name="email"
-                label="Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                fullWidth
-              />
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField label="Department" value={form.department} onChange={handleChange('department')} fullWidth required />
             </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
-            Save Employee
-          </Button>
-        </DialogActions>
-      </Box>
-    </Dialog>
+          <Stack direction="row" justifyContent="flex-end" mt={2.5}>
+            <Button type="submit" variant="contained" disabled={submitting}>
+              {submitting ? 'Saving...' : 'Add Employee'}
+            </Button>
+          </Stack>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 

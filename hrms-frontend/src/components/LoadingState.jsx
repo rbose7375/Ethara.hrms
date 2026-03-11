@@ -1,19 +1,20 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
 
-function LoadingState({ message = 'Loading data...' }) {
+function LoadingState({ message = 'Loading...' }) {
   return (
     <Box
       sx={{
-        py: 8,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        gap: 2,
+        minHeight: 220,
+        display: 'grid',
+        placeItems: 'center',
+        gap: 1.5,
+        py: 6,
       }}
     >
-      <CircularProgress />
-      <Typography color="text.secondary">{message}</Typography>
+      <CircularProgress size={28} />
+      <Typography variant="body2" color="text.secondary">
+        {message}
+      </Typography>
     </Box>
   );
 }

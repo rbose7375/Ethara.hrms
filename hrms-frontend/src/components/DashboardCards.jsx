@@ -1,28 +1,30 @@
-import { Card, CardContent, Grid, Typography } from '@mui/material';
-import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
-import TaskAltOutlinedIcon from '@mui/icons-material/TaskAltOutlined';
-import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
+import Groups2RoundedIcon from '@mui/icons-material/Groups2Rounded';
+import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
+import TaskAltRoundedIcon from '@mui/icons-material/TaskAltRounded';
+import { Card, CardContent, Grid, Stack, Typography } from '@mui/material';
 
-const cardItems = [
-  { key: 'totalEmployees', label: 'Total Employees', icon: <PeopleOutlineIcon color="primary" /> },
-  { key: 'presentToday', label: 'Present Today', icon: <TaskAltOutlinedIcon color="success" /> },
-  { key: 'absentToday', label: 'Absent Today', icon: <EventBusyOutlinedIcon color="error" /> },
+const cardConfig = [
+  { key: 'totalEmployees', label: 'Total Employees', icon: <Groups2RoundedIcon color='primary' /> },
+  { key: 'presentToday', label: 'Present Today', icon: <TaskAltRoundedIcon color='success' /> },
+  { key: 'absentToday', label: 'Absent Today', icon: <HighlightOffRoundedIcon color='error' /> },
 ];
 
 function DashboardCards({ stats }) {
   return (
-    <Grid container spacing={2.5}>
-      {cardItems.map((item) => (
-        <Grid item xs={12} md={4} key={item.key}>
-          <Card elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
+    <Grid container spacing={3}>
+      {cardConfig.map((item) => (
+        <Grid key={item.key} size={{ xs: 12, sm: 6, md: 4 }}>
+          <Card sx={{ borderRadius: 3, boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06)' }}>
             <CardContent>
-              <Typography color="text.secondary" variant="body2" sx={{ mb: 1 }}>
-                {item.label}
-              </Typography>
-              <Typography variant="h4" fontWeight={700} sx={{ mb: 1 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography variant="body2" color="text.secondary">
+                  {item.label}
+                </Typography>
+                {item.icon}
+              </Stack>
+              <Typography variant="h4" fontWeight={700}>
                 {stats[item.key] ?? 0}
               </Typography>
-              {item.icon}
             </CardContent>
           </Card>
         </Grid>

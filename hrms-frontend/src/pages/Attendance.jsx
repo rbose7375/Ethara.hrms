@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Stack, TextField, Typography } from '@mui/material';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import AttendanceForm from '../components/AttendanceForm';
 import AttendanceTable from '../components/AttendanceTable';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import LoadingState from '../components/LoadingState';
-import { getEmployeeAttendance, getEmployees, markAttendance } from '../services/api';
+import { getAttendance, getEmployees, markAttendance } from '../services/api';
+
+const normalizeList = (data) => (Array.isArray(data) ? data : data?.results || data?.data || []);
 
 function Attendance() {
   const [employees, setEmployees] = useState([]);
@@ -16,28 +18,26 @@ function Attendance() {
   const [error, setError] = useState('');
   const [banner, setBanner] = useState('');
 
-  const fetchData = useCallback(async () => {
+  const fetchAttendance = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-      const [employeesRes, attendanceRes] = await Promise.all([getEmployees(), getEmployeeAttendance()]);
-      const employeeList = Array.isArray(employeesRes.data) ? employeesRes.data : employeesRes.data.results || [];
-      const attendanceList = Array.isArray(attendanceRes.data)
-        ? attendanceRes.data
-        : attendanceRes.data.results || [];
+      const [employeesRes, recordsRes] = await Promise.all([getEmployees(), getAttendance()]);
+      const employeeList = normalizeList(employeesRes.data);
+      const attendanceList = normalizeList(recordsRes.data);
 
-      const employeesById = employeeList.reduce((acc, employee) => {
-        acc[employee.employee_id] = employee.full_name;
+      const employeeMap = employeeList.reduce((acc, item) => {
+        acc[item.employee_id] = item.full_name;
         return acc;
       }, {});
 
-      const normalizedRecords = attendanceList.map((item) => ({
-        ...item,
-        employee_name: item.employee_name || employeesById[item.employee_id] || 'Unknown Employee',
-      }));
-
       setEmployees(employeeList);
-      setRecords(normalizedRecords);
+      setRecords(
+        attendanceList.map((record) => ({
+          ...record,
+          employee_name: record.employee_name || employeeMap[record.employee_id] || 'Unknown Employee',
+        })),
+      );
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to fetch attendance records.');
     } finally {
@@ -46,20 +46,15 @@ function Attendance() {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const filteredRecords = useMemo(() => {
-    if (!dateFilter) return records;
-    return records.filter((record) => record.date === dateFilter);
-  }, [records, dateFilter]);
+    fetchAttendance();
+  }, [fetchAttendance]);
 
   const handleMarkAttendance = async (payload) => {
     try {
       setSubmitting(true);
       await markAttendance(payload);
       setBanner('Attendance marked successfully.');
-      await fetchData();
+      fetchAttendance();
     } catch (err) {
       setBanner(err.response?.data?.detail || 'Unable to mark attendance.');
     } finally {
@@ -67,29 +62,38 @@ function Attendance() {
     }
   };
 
+  const filteredRecords = useMemo(
+    () => (dateFilter ? records.filter((record) => record.date === dateFilter) : records),
+    [dateFilter, records],
+  );
+
   return (
-    <Stack spacing={2.5}>
+    <Stack spacing={3}>
       <Typography variant="h5" fontWeight={700}>
         Attendance Management
       </Typography>
 
-      {banner && <Alert onClose={() => setBanner('')}>{banner}</Alert>}
+      {banner && (
+        <Alert severity="info" onClose={() => setBanner('')}>
+          {banner}
+        </Alert>
+      )}
 
-      <AttendanceForm employees={employees} onSubmit={handleMarkAttendance} isSubmitting={submitting} />
+      <AttendanceForm employees={employees} onSubmit={handleMarkAttendance} submitting={submitting} />
 
       <TextField
         label="Filter by date"
         type="date"
         value={dateFilter}
-        onChange={(event) => setDateFilter(event.target.value)}
+        onChange={(e) => setDateFilter(e.target.value)}
         InputLabelProps={{ shrink: true }}
         sx={{ maxWidth: 260 }}
       />
 
-      {loading && <LoadingState message="Loading attendance data..." />}
-      {!loading && error && <ErrorState message={error} onRetry={fetchData} />}
+      {loading && <LoadingState message="Loading attendance records..." />}
+      {!loading && error && <ErrorState message={error} onRetry={fetchAttendance} />}
       {!loading && !error && filteredRecords.length === 0 && (
-        <EmptyState title="No attendance records" description="Attendance records will appear here once marked." />
+        <EmptyState title="No attendance records" description="Marked attendance records will show up here." />
       )}
       {!loading && !error && filteredRecords.length > 0 && <AttendanceTable records={filteredRecords} />}
     </Stack>
