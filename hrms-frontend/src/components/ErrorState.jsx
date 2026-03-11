@@ -1,13 +1,14 @@
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import { Alert, Box, Button } from '@mui/material';
 
-function ErrorState({ message = 'Something went wrong while fetching data.', onRetry }) {
+function ErrorState({ message = 'Unable to fetch data.', onRetry }) {
   return (
-    <Box sx={{ py: 4 }}>
+    <Box sx={{ py: 2 }}>
       <Alert
         severity="error"
         action={
           onRetry ? (
-            <Button color="inherit" size="small" onClick={onRetry}>
+            <Button color="inherit" size="small" startIcon={<RefreshRoundedIcon />} onClick={onRetry}>
               Retry
             </Button>
           ) : null

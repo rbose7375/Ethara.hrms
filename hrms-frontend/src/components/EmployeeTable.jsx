@@ -1,6 +1,8 @@
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import {
+  Card,
+  CardContent,
   IconButton,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -8,41 +10,48 @@ import {
   TableHead,
   TableRow,
   Tooltip,
+  Typography,
 } from '@mui/material';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 function EmployeeTable({ employees, onDelete }) {
   return (
-    <TableContainer component={Paper} elevation={0} sx={{ border: 1, borderColor: 'divider' }}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Employee ID</TableCell>
-            <TableCell>Full Name</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Department</TableCell>
-            <TableCell align="right">Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {employees.map((employee) => (
-            <TableRow key={employee.id || employee.employee_id} hover>
-              <TableCell>{employee.employee_id}</TableCell>
-              <TableCell>{employee.full_name}</TableCell>
-              <TableCell>{employee.email}</TableCell>
-              <TableCell>{employee.department}</TableCell>
-              <TableCell align="right">
-                <Tooltip title="Delete employee">
-                  <IconButton color="error" onClick={() => onDelete(employee.id)}>
-                    <DeleteOutlineIcon />
-                  </IconButton>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Card sx={{ borderRadius: 3 }}>
+      <CardContent>
+        <Typography variant="h6" fontWeight={700} mb={2}>
+          Employee Directory
+        </Typography>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Employee ID</TableCell>
+                <TableCell>Full Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Department</TableCell>
+                <TableCell align="right">Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {employees.map((employee) => (
+                <TableRow hover key={employee.id || employee.employee_id}>
+                  <TableCell>{employee.employee_id}</TableCell>
+                  <TableCell>{employee.full_name}</TableCell>
+                  <TableCell>{employee.email}</TableCell>
+                  <TableCell>{employee.department}</TableCell>
+                  <TableCell align="right">
+                    <Tooltip title="Delete Employee">
+                      <IconButton color="error" onClick={() => onDelete(employee.id || employee.employee_id)}>
+                        <DeleteOutlineRoundedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </CardContent>
+    </Card>
   );
 }
 

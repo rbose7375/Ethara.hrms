@@ -1,46 +1,57 @@
-import { AppBar, Box, IconButton, Toolbar, Typography } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import { useLocation } from 'react-router-dom';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import { AppBar, Box, Button, IconButton, Toolbar, Typography } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { clearAuthData, getUser } from '../services/auth';
 
-const pageTitleMap = {
+const TITLE_BY_PATH = {
   '/': 'Dashboard',
   '/employees': 'Employees',
   '/attendance': 'Attendance',
 };
 
-function Topbar({ onMenuClick, drawerWidth }) {
-  const location = useLocation();
-  const title = pageTitleMap[location.pathname] || 'HRMS Admin';
+function Topbar({ drawerWidth, onMenuClick }) {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const title = TITLE_BY_PATH[pathname] || 'Admin Panel';
+  const user = getUser();
+
+  const handleLogout = () => {
+    clearAuthData();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <AppBar
-      position="fixed"
-      color="inherit"
       elevation={0}
+      color="inherit"
+      position="fixed"
       sx={{
+        width: { lg: `calc(100% - ${drawerWidth}px)` },
+        ml: { lg: `${drawerWidth}px` },
         borderBottom: 1,
         borderColor: 'divider',
-        width: { md: `calc(100% - ${drawerWidth}px)` },
-        ml: { md: `${drawerWidth}px` },
+        bgcolor: 'rgba(255,255,255,0.9)',
+        backdropFilter: 'blur(6px)',
       }}
     >
-      <Toolbar>
-        <IconButton
-          color="inherit"
-          edge="start"
-          onClick={onMenuClick}
-          sx={{ mr: 2, display: { md: 'none' } }}
-        >
-          <MenuIcon />
+      <Toolbar sx={{ minHeight: 72, px: { xs: 2, md: 3 } }}>
+        <IconButton edge="start" onClick={onMenuClick} sx={{ display: { lg: 'none' }, mr: 1 }}>
+          <MenuRoundedIcon />
         </IconButton>
-        <Box>
-          <Typography variant="h6" fontWeight={700}>
+
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="h5" fontWeight={700} lineHeight={1.2}>
             {title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Welcome to the HRMS Admin dashboard
+            Welcome back{user?.full_name ? `, ${user.full_name}` : ''}
           </Typography>
         </Box>
+
+        <Button variant="outlined" startIcon={<LogoutRoundedIcon />} onClick={handleLogout}>
+          Logout
+        </Button>
       </Toolbar>
     </AppBar>
   );

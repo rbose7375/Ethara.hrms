@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Paper, Stack, Typography } from '@mui/material';
-import DashboardCards from '../components/DashboardCards';
+import { Stack, Typography } from '@mui/material';
 import AttendanceTable from '../components/AttendanceTable';
+import DashboardCards from '../components/DashboardCards';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import LoadingState from '../components/LoadingState';
-import { getEmployeeAttendance, getEmployees } from '../services/api';
+import { getAttendance, getEmployees } from '../services/api';
+
+const normalizeList = (data) => (Array.isArray(data) ? data : data?.results || data?.data || []);
 
 function Dashboard() {
   const [employees, setEmployees] = useState([]);
@@ -13,18 +15,16 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchOverview = useCallback(async () => {
+  const fetchDashboard = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-      const [employeesRes, attendanceRes] = await Promise.all([getEmployees(), getEmployeeAttendance()]);
-      const employeeList = Array.isArray(employeesRes.data) ? employeesRes.data : employeesRes.data.results || [];
-      const attendanceList = Array.isArray(attendanceRes.data)
-        ? attendanceRes.data
-        : attendanceRes.data.results || [];
+      const [employeesRes, attendanceRes] = await Promise.all([getEmployees(), getAttendance()]);
+      const employeeList = normalizeList(employeesRes.data);
+      const attendanceList = normalizeList(attendanceRes.data);
 
-      const employeesById = employeeList.reduce((acc, employee) => {
-        acc[employee.employee_id] = employee.full_name;
+      const employeeMap = employeeList.reduce((acc, item) => {
+        acc[item.employee_id] = item.full_name;
         return acc;
       }, {});
 
@@ -32,50 +32,49 @@ function Dashboard() {
       setAttendance(
         attendanceList.map((record) => ({
           ...record,
-          employee_name: record.employee_name || employeesById[record.employee_id] || 'Unknown Employee',
+          employee_name: record.employee_name || employeeMap[record.employee_id] || 'Unknown Employee',
         })),
       );
     } catch (err) {
-      setError(err.response?.data?.detail || 'Unable to load dashboard data.');
+      setError(err.response?.data?.detail || 'Failed to load dashboard data.');
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchOverview();
-  }, [fetchOverview]);
+    fetchDashboard();
+  }, [fetchDashboard]);
 
   const stats = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
     const todayRecords = attendance.filter((record) => record.date === today);
-
     return {
       totalEmployees: employees.length,
       presentToday: todayRecords.filter((record) => record.status === 'Present').length,
       absentToday: todayRecords.filter((record) => record.status === 'Absent').length,
     };
-  }, [employees, attendance]);
+  }, [attendance, employees]);
 
-  const recentRecords = useMemo(() => attendance.slice(0, 6), [attendance]);
+  const recentAttendance = useMemo(() => attendance.slice(0, 6), [attendance]);
 
-  if (loading) return <LoadingState message="Preparing dashboard..." />;
-  if (error) return <ErrorState message={error} onRetry={fetchOverview} />;
+  if (loading) return <LoadingState message="Loading dashboard overview..." />;
+  if (error) return <ErrorState message={error} onRetry={fetchDashboard} />;
 
   return (
-    <Stack spacing={2.5}>
+    <Stack spacing={3}>
       <DashboardCards stats={stats} />
-
-      <Paper elevation={0} sx={{ p: 2.5, border: 1, borderColor: 'divider' }}>
-        <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>
-          Recent Attendance Records
-        </Typography>
-        {recentRecords.length > 0 ? (
-          <AttendanceTable records={recentRecords} />
-        ) : (
-          <EmptyState title="No recent attendance" description="Recent attendance updates will appear here." />
-        )}
-      </Paper>
+      {recentAttendance.length > 0 ? (
+        <AttendanceTable records={recentAttendance} title="Recent Attendance Records" />
+      ) : (
+        <EmptyState
+          title="No recent attendance"
+          description="Recent attendance updates will appear here once records are added."
+        />
+      )}
+      <Typography variant="body2" color="text.secondary">
+        Monitor employee attendance and trends from this centralized admin dashboard.
+      </Typography>
     </Stack>
   );
 }

@@ -1,20 +1,26 @@
+import InboxRoundedIcon from '@mui/icons-material/InboxRounded';
 import { Box, Typography } from '@mui/material';
-import InboxIcon from '@mui/icons-material/Inbox';
 
-function EmptyState({ title = 'No data available', description = 'Please add new records to get started.' }) {
+function EmptyState({ title = 'No data found', description = 'Try adjusting filters or adding a new record.' }) {
   return (
     <Box
       sx={{
-        py: 8,
         textAlign: 'center',
-        color: 'text.secondary',
+        py: 8,
+        px: 3,
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 3,
+        bgcolor: 'background.paper',
       }}
     >
-      <InboxIcon color="disabled" sx={{ fontSize: 48, mb: 1 }} />
-      <Typography variant="h6" color="text.primary">
+      <InboxRoundedIcon color="disabled" sx={{ fontSize: 44, mb: 1 }} />
+      <Typography variant="h6" sx={{ mb: 0.5 }}>
         {title}
       </Typography>
-      <Typography variant="body2">{description}</Typography>
+      <Typography variant="body2" color="text.secondary">
+        {description}
+      </Typography>
     </Box>
   );
 }

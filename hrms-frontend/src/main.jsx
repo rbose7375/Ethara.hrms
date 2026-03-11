@@ -8,12 +8,26 @@ import './index.css';
 const theme = createTheme({
   palette: {
     mode: 'light',
-    primary: { main: '#4F46E5' },
-    background: { default: '#f7f8fc' },
+    primary: { main: '#4f46e5' },
+    background: { default: '#f6f8fc', paper: '#ffffff' },
   },
   shape: { borderRadius: 12 },
   typography: {
     fontFamily: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'].join(','),
+    h5: { fontSize: '1.5rem' },
+  },
+  components: {
+    MuiButton: {
+      defaultProps: { disableElevation: true },
+      styleOverrides: {
+        root: { borderRadius: 10, textTransform: 'none', fontWeight: 600 },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: { border: '1px solid #e5e7eb' },
+      },
+    },
   },
 });
 

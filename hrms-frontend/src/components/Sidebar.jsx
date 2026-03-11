@@ -1,42 +1,68 @@
-import { Box, Divider, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
-import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import ApartmentRoundedIcon from '@mui/icons-material/ApartmentRounded';
+import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
+import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
+import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded';
+import {
+  Box,
+  Divider,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 const navItems = [
-  { label: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-  { label: 'Employees', icon: <PeopleIcon />, path: '/employees' },
-  { label: 'Attendance', icon: <EventAvailableIcon />, path: '/attendance' },
+  { label: 'Dashboard', icon: <DashboardRoundedIcon />, path: '/' },
+  { label: 'Employees', icon: <PeopleAltRoundedIcon />, path: '/employees' },
+  { label: 'Attendance', icon: <EventAvailableRoundedIcon />, path: '/attendance' },
 ];
 
-function Sidebar({ mobileOpen, onClose, drawerWidth }) {
-  const location = useLocation();
+function Sidebar({ drawerWidth, mobileOpen, onClose }) {
+  const { pathname } = useLocation();
 
-  const drawerContent = (
-    <Box>
-      <Toolbar>
-        <Typography variant="h6" fontWeight={700} color="primary.main">
-          Ethara HRMS
-        </Typography>
+  const content = (
+    <>
+      <Toolbar sx={{ px: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+          <ApartmentRoundedIcon color="primary" />
+          <Typography variant="h6" fontWeight={700} color="primary.main">
+            Ethara HRMS
+          </Typography>
+        </Box>
       </Toolbar>
       <Divider />
-      <List sx={{ px: 1, py: 2 }}>
-        {navItems.map((item) => (
-          <ListItemButton
-            key={item.path}
-            component={RouterLink}
-            to={item.path}
-            selected={location.pathname === item.path}
-            onClick={onClose}
-            sx={{ borderRadius: 2, mb: 0.5 }}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.label} />
-          </ListItemButton>
-        ))}
+      <List sx={{ px: 1.5, py: 2 }}>
+        {navItems.map((item) => {
+          const selected = pathname === item.path;
+          return (
+            <ListItemButton
+              key={item.path}
+              component={RouterLink}
+              to={item.path}
+              selected={selected}
+              onClick={onClose}
+              sx={{
+                borderRadius: 2.5,
+                mb: 0.8,
+                minHeight: 46,
+                '&.Mui-selected': {
+                  bgcolor: 'rgba(79,70,229,0.12)',
+                  color: 'primary.main',
+                  '& .MuiListItemIcon-root': { color: 'primary.main' },
+                },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 38 }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: selected ? 600 : 500 }} />
+            </ListItemButton>
+          );
+        })}
       </List>
-    </Box>
+    </>
   );
 
   return (
@@ -47,21 +73,27 @@ function Sidebar({ mobileOpen, onClose, drawerWidth }) {
         onClose={onClose}
         ModalProps={{ keepMounted: true }}
         sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          display: { xs: 'block', lg: 'none' },
+          '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box' },
         }}
       >
-        {drawerContent}
+        {content}
       </Drawer>
       <Drawer
         variant="permanent"
         open
         sx={{
-          display: { xs: 'none', md: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          display: { xs: 'none', lg: 'block' },
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            borderRight: 1,
+            borderColor: 'divider',
+            bgcolor: '#fff',
+          },
         }}
       >
-        {drawerContent}
+        {content}
       </Drawer>
     </>
   );
