@@ -31,6 +31,7 @@ class StackHolderViewSet(viewsets.ModelViewSet):
 
             return Response({
                 "token": token.key,
+                "role" : "admin",
                 "user_data": serializer.data
             }, status=status.HTTP_200_OK)
 

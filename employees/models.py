@@ -36,8 +36,8 @@ class Attendance(models.Model):
 
 class AttedanceLog(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    time_in = models.TimeField()
-    time_out = models.TimeField()
+    time_in = models.TimeField(null=True, blank=True, default=None)
+    time_out = models.TimeField(null=True, blank=True, default=None)
     attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
 
     is_deleted = models.BooleanField(default=False)
@@ -53,4 +53,4 @@ class AttedanceLog(models.Model):
         if self.time_out and self.time_in:
             total_time = datetime.combine(date.min, self.time_out) - datetime.combine(date.min, self.time_in)
             return total_time / timedelta(minutes=60)  # return total time in hours
-        return timedelta(0)
+        return 0
