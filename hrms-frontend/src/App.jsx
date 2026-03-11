@@ -1,45 +1,20 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import AdminLogin from "./admin/AdminLogin";
-import AdminDashboard from "./admin/AdminDashboard";
-import EmployeeDashboard from "./admin/EmployeeDashboard";
-
-import ProtectedRoute from "./routes/ProtectedRoute";
+import { Navigate, Route, Routes } from 'react-router-dom';
+import DashboardLayout from './layouts/DashboardLayout';
+import Attendance from './pages/Attendance';
+import Dashboard from './pages/Dashboard';
+import Employees from './pages/Employees';
 
 function App() {
-
   return (
-
-    <BrowserRouter>
-
-      <Routes>
-
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<AdminLogin />} />
-
-        <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute role="admin">
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/employee/dashboard"
-          element={
-            <ProtectedRoute role="employee">
-              <EmployeeDashboard />
-            </ProtectedRoute>
-          }
-        />
-
-      </Routes>
-
-    </BrowserRouter>
-
+    <Routes>
+      <Route element={<DashboardLayout />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/employees" element={<Employees />} />
+        <Route path="/attendance" element={<Attendance />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
-
 }
 
 export default App;
