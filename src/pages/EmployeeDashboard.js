@@ -25,6 +25,9 @@ const summaryCards = [
   { key: 'absentDays', label: 'Absent Days', icon: <AccessTimeRoundedIcon color="error" /> },
 ];
 
+const sortLogsByTimeInDesc = (logs = []) =>
+  [...logs].sort((left, right) => `${right?.time_in || ''}`.localeCompare(`${left?.time_in || ''}`));
+
 function EmployeeDashboard() {
   const navigate = useNavigate();
   const user = getUser();
@@ -83,15 +86,25 @@ function EmployeeDashboard() {
 
   const today = dayjs().format('YYYY-MM-DD');
   const todayRecord = useMemo(() => records.find((record) => record.date === today), [records, today]);
-  const todayLogs = useMemo(() => {
-    const logs = Array.isArray(todayRecord?.logs) ? [...todayRecord.logs] : [];
-    return logs.sort((left, right) => `${right.time_in || ''}`.localeCompare(`${left.time_in || ''}`));
-  }, [todayRecord]);
-  const latestTodayLog = todayLogs[0] || null;
-  const activeTodayLog = useMemo(
-    () => todayLogs.find((log) => log?.time_in && !log?.time_out) || null,
-    [todayLogs],
+  const activeSession = useMemo(() => {
+    for (const record of records) {
+      const logs = sortLogsByTimeInDesc(Array.isArray(record?.logs) ? record.logs : []);
+      const activeLog = logs.find((log) => log?.time_in && !log?.time_out);
+
+      if (activeLog) {
+        return { record, log: activeLog };
+      }
+    }
+
+    return null;
+  }, [records]);
+  const sessionRecord = activeSession?.record || todayRecord || null;
+  const sessionLogs = useMemo(
+    () => sortLogsByTimeInDesc(Array.isArray(sessionRecord?.logs) ? sessionRecord.logs : []),
+    [sessionRecord],
   );
+  const latestSessionLog = sessionLogs[0] || null;
+  const activeTodayLog = activeSession?.log || null;
   const canTimeIn = !activeTodayLog;
   const canTimeOut = Boolean(activeTodayLog);
   const mergedAction = canTimeOut
@@ -113,21 +126,21 @@ function EmployeeDashboard() {
       };
   const sessionChipLabel = activeTodayLog
     ? 'Time In is active'
-    : todayLogs.length > 0
+    : sessionLogs.length > 0
       ? 'Ready for next session'
       : 'No session started';
-  const sessionChipColor = activeTodayLog ? 'warning' : todayLogs.length > 0 ? 'success' : 'primary';
+  const sessionChipColor = activeTodayLog ? 'warning' : sessionLogs.length > 0 ? 'success' : 'primary';
   const sessionMessage = activeTodayLog
     ? `Active since ${formatTimeLabel(activeTodayLog.time_in, timeZone)}. Finish with Time Out before the next Time In.`
-    : latestTodayLog?.time_out
-      ? `Last session ended at ${formatTimeLabel(latestTodayLog.time_out, timeZone)}. You can start another Time In today.`
+    : latestSessionLog?.time_out
+      ? `Last session ended at ${formatTimeLabel(latestSessionLog.time_out, timeZone)}. You can start another Time In today.`
       : 'Use Time In to start your first session for today.';
   const lastRecordedTime = activeTodayLog?.time_in
     ? { label: 'Last Time In', value: activeTodayLog.time_in }
-    : latestTodayLog?.time_out
-      ? { label: 'Last Time Out', value: latestTodayLog.time_out }
-      : latestTodayLog?.time_in
-        ? { label: 'Last Time In', value: latestTodayLog.time_in }
+    : latestSessionLog?.time_out
+      ? { label: 'Last Time Out', value: latestSessionLog.time_out }
+      : latestSessionLog?.time_in
+        ? { label: 'Last Time In', value: latestSessionLog.time_in }
         : null;
 
   return (
@@ -201,9 +214,13 @@ function EmployeeDashboard() {
                   <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                     <Chip label={dayjs().format('dddd, D MMMM YYYY')} variant="outlined" />
                     <Chip
-                      label={todayRecord ? `Today: ${todayRecord.status}` : 'Today: no record yet'}
-                      color={todayRecord && `${todayRecord.status}`.toLowerCase() === 'present' ? 'success' : 'default'}
-                      variant={todayRecord ? 'filled' : 'outlined'}
+                      label={activeTodayLog ? 'Current session: Present' : todayRecord ? `Today: ${todayRecord.status}` : 'Today: no record yet'}
+                      color={
+                        activeTodayLog || (todayRecord && `${todayRecord.status}`.toLowerCase() === 'present')
+                          ? 'success'
+                          : 'default'
+                      }
+                      variant={activeTodayLog || todayRecord ? 'filled' : 'outlined'}
                     />
                   </Stack>
                 </Box>
