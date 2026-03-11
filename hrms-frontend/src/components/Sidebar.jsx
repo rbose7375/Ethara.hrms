@@ -84,6 +84,8 @@ function Sidebar({ drawerWidth, mobileOpen, onClose }) {
         open
         sx={{
           display: { xs: 'none', lg: 'block' },
+          width: drawerWidth,
+          flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',

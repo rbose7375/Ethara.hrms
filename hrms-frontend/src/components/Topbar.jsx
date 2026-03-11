@@ -1,8 +1,9 @@
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import { AppBar, Box, Button, IconButton, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, IconButton, Stack, Toolbar, Typography } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { clearAuthData, getUser } from '../services/auth';
+import TimeZoneSelector from './TimeZoneSelector';
 
 const TITLE_BY_PATH = {
   '/': 'Dashboard',
@@ -35,7 +36,7 @@ function Topbar({ drawerWidth, onMenuClick }) {
         backdropFilter: 'blur(6px)',
       }}
     >
-      <Toolbar sx={{ minHeight: 72, px: { xs: 2, md: 3 } }}>
+      <Toolbar sx={{ minHeight: 72, px: { xs: 2, md: 3 }, gap: 1.5, flexWrap: 'wrap' }}>
         <IconButton edge="start" onClick={onMenuClick} sx={{ display: { lg: 'none' }, mr: 1 }}>
           <MenuRoundedIcon />
         </IconButton>
@@ -49,9 +50,12 @@ function Topbar({ drawerWidth, onMenuClick }) {
           </Typography>
         </Box>
 
-        <Button variant="outlined" startIcon={<LogoutRoundedIcon />} onClick={handleLogout}>
-          Logout
-        </Button>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+          <TimeZoneSelector sx={{ minWidth: { xs: '100%', sm: 120 } }} />
+          <Button variant="outlined" startIcon={<LogoutRoundedIcon />} onClick={handleLogout}>
+            Logout
+          </Button>
+        </Stack>
       </Toolbar>
     </AppBar>
   );

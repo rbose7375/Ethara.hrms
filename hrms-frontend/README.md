@@ -1,19 +1,24 @@
-# Vite + Deno + React
+# Ethara HRMS Frontend
 
 ## Running
 
-You need to have Deno v2.0.0 or later installed to run this repo.
+Install dependencies and start the Vite dev server:
 
-Start a dev server:
-
+```bash
+npm install
+npm run dev
 ```
-$ deno task dev
+
+## Build
+
+Create a production build:
+
+```bash
+npm run build
 ```
 
-## Deploy
+Preview the production build locally:
 
-Build production assets:
-
-```
-$ deno task build
+```bash
+npm run preview
 ```

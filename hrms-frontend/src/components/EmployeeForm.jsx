@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Button, Card, CardContent, Grid, Stack, TextField, Typography } from '@mui/material';
 
 const initialForm = {
-  employee_id: '',
   full_name: '',
-  email: '',
+  email_address: '',
   department: '',
+  password: '',
 };
 
 function EmployeeForm({ onSubmit, submitting }) {
@@ -17,8 +17,10 @@ function EmployeeForm({ onSubmit, submitting }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await onSubmit(form);
-    setForm(initialForm);
+    const isSuccess = await onSubmit(form);
+    if (isSuccess) {
+      setForm(initialForm);
+    }
   };
 
   return (
@@ -30,16 +32,30 @@ function EmployeeForm({ onSubmit, submitting }) {
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2.5}>
             <Grid size={{ xs: 12, md: 6 }}>
-              <TextField label="Employee ID" value={form.employee_id} onChange={handleChange('employee_id')} fullWidth required />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
               <TextField label="Full Name" value={form.full_name} onChange={handleChange('full_name')} fullWidth required />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-              <TextField label="Email" type="email" value={form.email} onChange={handleChange('email')} fullWidth required />
+              <TextField
+                label="Email Address"
+                type="email"
+                value={form.email_address}
+                onChange={handleChange('email_address')}
+                fullWidth
+                required
+              />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField label="Department" value={form.department} onChange={handleChange('department')} fullWidth required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                label="Password"
+                type="password"
+                value={form.password}
+                onChange={handleChange('password')}
+                fullWidth
+                required
+              />
             </Grid>
           </Grid>
           <Stack direction="row" justifyContent="flex-end" mt={2.5}>

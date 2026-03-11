@@ -10,7 +10,7 @@ function DashboardLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f6f8fc' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', width: '100%', bgcolor: '#f6f8fc' }}>
       <Topbar drawerWidth={drawerWidth} onMenuClick={() => setMobileOpen(true)} />
       <Sidebar drawerWidth={drawerWidth} mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
@@ -18,7 +18,7 @@ function DashboardLayout() {
         component="main"
         sx={{
           flexGrow: 1,
-          width: { lg: `calc(100% - ${drawerWidth}px)` },
+          minWidth: 0,
         }}
       >
         <Toolbar sx={{ minHeight: '72px !important' }} />

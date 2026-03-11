@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { clearAuthData, getToken } from './auth';
 
+const BASE_URL = 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: '/api/v1/',
+  baseURL: `${BASE_URL}/api/v1/`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,7 +13,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Token ${token}`;
   }
   return config;
 });
@@ -35,7 +37,7 @@ export const deleteEmployee = (id) => api.delete(`admin/employees/${id}/`);
 
 export const getAttendance = (params = {}) => api.get('employee/attendance/', { params });
 export const markAttendance = (payload) => api.post('employee/attendance/', payload);
-export const employeeTimeIn = (payload) => api.post('employee/time-in/', payload);
-export const employeeTimeOut = (payload) => api.post('employee/time-out/', payload);
+export const employeeTimeIn = (payload = {}) => api.post('employee/time-in', payload);
+export const employeeTimeOut = (payload = {}) => api.post('employee/time-out', payload);
 
 export default api;
